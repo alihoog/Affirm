@@ -22,6 +22,18 @@ LIMIT 1;
 
 
 //c. Which merchant saw the second best average loan return percentage for loans taken out in 2016?
+SELECT m.merchant_name, AVG(l.loan_return_percentage) AS average_return_percentage
+FROM affirm.loans_table l
+JOIN affirm.merchant_data m ON l.merchant_id = m.merchant_id
+WHERE EXTRACT(YEAR FROM l.checkout_date) = 16
+GROUP BY m.merchant_name
+ORDER BY average_return_percentage DESC
+LIMIT 1;
+
+
+
+//d. Generate the SQL that would output the data structure below. Note that the actual values shown below are just
+samples for reference.
 SELECT
   action_date AS date,
   COUNT(CASE WHEN action = 'Checkout Loaded' THEN 1 END) AS num_loaded,
