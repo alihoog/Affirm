@@ -17,3 +17,15 @@
     GROUP BY
         m.category;
 
+//revenue summary
+ SELECT
+        m.category AS merchant_industry,
+        SUM((l.mdr + l.loan_return_percentage) * l.loan_amount) AS total_revenue,
+        SUM(l.loan_amount) AS loan_amt,
+        SUM((l.mdr + l.loan_return_percentage) * l.loan_amount)/SUM(l.loan_amount) AS rev_ratio
+    FROM
+        funnel_data.loans_table AS l
+    JOIN
+        funnel_data.merchant_data AS m ON l.merchant_id = m.merchant_id
+    GROUP BY
+        m.category;
