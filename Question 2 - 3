@@ -50,3 +50,21 @@
         affirm.merchant_data AS m ON f.merchant_id = m.merchant_id
     GROUP BY
         m.category;
+        
+//fico bands by age brackets        
+ SELECT
+        CASE  
+        WHEN (2023 -l.user_dob_year) BETWEEN 25 AND 34 THEN '25 -34'
+        WHEN (2023 -l.user_dob_year) BETWEEN 35 AND 44 THEN '35 - 44'
+        WHEN (2023 -l.user_dob_year) BETWEEN 45 AND 54 THEN '45 - 54'
+        WHEN (2023 -l.user_dob_year) BETWEEN 55 AND 54 THEN '55 -64'
+        ELSE '65 AND Older'
+        End AS age_group,
+        AVG(l.fico_score) AS avg_fico_score
+    FROM
+        funnel_data.loans_table AS l
+    GROUP BY
+        age_group
+    ORDER BY
+    age_group;
+
