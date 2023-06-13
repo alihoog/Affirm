@@ -1,0 +1,36 @@
+//a. How many users took out loans in March 2016 who were born in the 1980’s?
+SELECT COUNT(DISTINCT l.user_id) AS loan_count
+FROM affirm.loans_table l
+WHERE EXTRACT(YEAR FROM l.checkout_date) = 16
+AND EXTRACT(MONTH FROM l.checkout_date) = 3
+AND l.user_dob_year >= 1980
+AND l.user_dob_year < 1990;
+
+
+//b. What merchant industry had the most dollars loaned to repeat users in 2016?
+//Assumption - users_first_capture is the date of first loan i.e returning customer if not null
+
+SELECT m.category, SUM(l.loan_amount) AS total_loan_amount
+FROM affirm.loans_table l
+JOIN affirm.merchant_data m 
+ON l.merchant_id = m.merchant_id
+WHERE EXTRACT(YEAR FROM l.checkout_date) = 16
+  AND l.users_first_capture IS NOT NULL
+GROUP BY m.category
+ORDER BY total_loan_amount DESC
+LIMIT 1;
+
+
+//c. Which merchant saw the second best average loan return percentage for loans taken out in 2016?
+SELECT
+  action_date AS date,
+  COUNT(CASE WHEN action = 'Checkout Loaded' THEN 1 END) AS num_loaded,
+  COUNT(CASE WHEN action = 'Loan Terms Run' THEN 1 END) AS num_applied,
+  COUNT(CASE WHEN action = 'Loan Terms Approved' THEN 1 END) AS num_approved,
+  COUNT(CASE WHEN action = 'Checkout Completed' THEN 1 END) AS num_confirmed,
+  COUNT(CASE WHEN action = 'Loan Terms Run' THEN 1 END) / COUNT(CASE WHEN action = 'Checkout Loaded' THEN 1 END) AS application_rate,
+  COUNT(CASE WHEN action = 'Loan Terms Approved' THEN 1 END) / COUNT(CASE WHEN action = 'Loan Terms Run' THEN 1 END) AS approval_rate,
+  COUNT(CASE WHEN action = 'Checkout Completed' THEN 1 END) / COUNT(CASE WHEN action = 'Loan Terms Approved' THEN 1 END) AS confirmation_rate
+FROM affirm.funnel_table f
+GROUP BY action_date
+order by action_date;
