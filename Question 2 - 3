@@ -1,0 +1,19 @@
+//Funnel summary;
+ SELECT
+        m.category AS merchant_industry,
+        COUNT(CASE WHEN f.action = 'Checkout Loaded' THEN 1 END) AS num_loaded,
+        COUNT(CASE WHEN f.action = 'Loan Terms Run' THEN 1 END) AS num_applied,
+        COUNT(CASE WHEN f.action = 'Loan Terms Approved' THEN 1 END) AS num_approved,
+        COUNT(CASE WHEN f.action = 'Checkout Completed' THEN 1 END) AS num_confirmed,
+        COUNT(CASE WHEN action = 'Loan Terms Run' THEN 1 END) / COUNT(CASE WHEN action = 'Checkout Loaded' THEN 1 END) AS application_rate,
+  COUNT(CASE WHEN action = 'Loan Terms Approved' THEN 1 END) / COUNT(CASE WHEN action = 'Loan Terms Run' THEN 1 END) AS approval_rate,
+  COUNT(CASE WHEN action = 'Checkout Completed' THEN 1 END) / COUNT(CASE WHEN action = 'Loan Terms Approved' THEN 1 END) AS confirmation_rate
+    FROM
+        affirm.funnel_table AS f
+    left JOIN
+        affirm.loans_table AS l ON f.checkout_id = l.checkout_id
+    JOIN
+        affirm.merchant_data AS m ON f.merchant_id = m.merchant_id
+    GROUP BY
+        m.category;
+
